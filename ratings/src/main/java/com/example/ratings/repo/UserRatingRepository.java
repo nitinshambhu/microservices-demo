@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface UserRatingRepository extends JpaRepository<UserRating, Integer> {
 
-    List<UserRating> findByHep(int userId);
+    List<UserRating> findByuid(int userId);
 }

@@ -20,6 +20,6 @@ public class RatingsController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
     public List<UserRating> getRatings(@PathVariable int userId){
-        return userRatingRepo.find;
+        return null; //userRatingRepo.find;
     }
 }
