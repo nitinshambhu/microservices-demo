@@ -18,8 +18,18 @@ public class RatingsController {
     @Autowired
     UserRatingRepository userRatingRepo;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public List<UserRating> getRatings(@PathVariable int userId){
-        return null; //userRatingRepo.find;
+    @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
+    public List<UserRating> getByUserId(@PathVariable int userId){
+        return userRatingRepo.findByUid(userId);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movie/{movieId}")
+    public List<UserRating> getByMovieId(@PathVariable int movieId){
+        return userRatingRepo.findByMid(movieId);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/rating/{rating}")
+    public List<UserRating> getByRating(@PathVariable int rating){
+        return userRatingRepo.findByRating(rating);
     }
 }
