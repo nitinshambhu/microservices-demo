@@ -9,8 +9,16 @@ insert into user(id, name) VALUES (102, 'Pradyumna');
 insert into user(id, name) VALUES (103, 'Aniruddha');
 
 
-insert into movie(id, name) VALUES (001, 'Prahlada');
-insert into movie(id, name) VALUES (002, 'Kalki');
-insert into movie(id, name) VALUES (003, 'Bahubali');
-insert into movie(id, name) VALUES (004, 'Shatakarni');
-insert into movie(id, name) VALUES (005, 'Bhairavadweepam');
+insert into movie(id, name) VALUES (201, 'Prahlada');
+insert into movie(id, name) VALUES (202, 'Kalki');
+insert into movie(id, name) VALUES (203, 'Bahubali');
+insert into movie(id, name) VALUES (204, 'Shatakarni');
+insert into movie(id, name) VALUES (205, 'Bhairavadweepam');
+
+
+insert into user_rating VALUES (1, 103, 201, 4);
+insert into user_rating VALUES (2, 103, 205, 4);
+insert into user_rating VALUES (3, 101, 202, 5);
+insert into user_rating VALUES (4, 100, 201, 4);
+insert into user_rating VALUES (5, 102, 204, 5);
+insert into user_rating VALUES (6, 102, 203, 3);
