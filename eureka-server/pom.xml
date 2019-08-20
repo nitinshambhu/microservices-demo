@@ -38,6 +38,7 @@
 
 		https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
 		 -->
+		<!-- 4 dependencies related to the above issue starts here -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -58,6 +59,7 @@
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		<!-- 4 dependencies related to the above issue ends here -->
 	</dependencies>
 
 	<dependencyManagement>
