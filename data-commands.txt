@@ -1,3 +1,8 @@
+
+movie-lookup-service :: 8083 => http://localhost:8083/
+user-lookup-service :: 8082 => http://localhost:8082/
+user-rating-service :: 8081 => http://localhost:8081/
+
 insert into user(id, name) VALUES (100, 'Vasudeva');
 insert into user(id, name) VALUES (101, 'Sankarshana');
 insert into user(id, name) VALUES (102, 'Pradyumna');
