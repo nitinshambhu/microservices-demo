@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/user-ratings")
 public class RatingsController {
@@ -27,30 +29,29 @@ public class RatingsController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
     public RatingDTO getByUserId(@PathVariable int userId) {
-
+        log.info("Finding movies rated by user {} ", userId);
         List<Rating> ratings = ratingRepository.findByUid(userId);
 
         RestTemplate restTemplate = new RestTemplate();
         RatingDTO ratingDTO = new RatingDTO();
-        ArrayList<Pair> list = new ArrayList<>();
 
         User user = restTemplate.getForObject("http://localhost:8082/user/"+userId, User.class);
-        System.out.println("TinTin : ratings = "+ratings);
+        log.info("ratings = {} ", ratings);
 
-        ratings.stream()
-                .map((Function<Rating, Pair>) rating -> {
-                    Movie movie = restTemplate.getForObject("http://localhost:8083/movie/"+rating.getMid(), Movie.class);
-                    System.out.println("TinTin : movie = "+movie);
+        List<Pair<String, Integer>> list = ratings.stream()
+                .map(rating -> {
+                    Movie movie = restTemplate.getForObject("http://localhost:8083/movie/" + rating.getMid(), Movie.class);
+                    System.out.println("TinTin : movie = " + movie);
                     return Pair.of(movie.getName(), rating.getRating());
                 })
-                .forEach(list::add);
+                .collect(Collectors.toList());
 
         if(user != null) {
             ratingDTO.setName(user.getName());
             ratingDTO.setList(list);
         }
 
-        System.out.println("TinTin : ratingDTO = "+ratingDTO);
+        log.info("returning DTO = {} ", ratingDTO);
         return ratingDTO;
     }
 
@@ -61,16 +62,15 @@ public class RatingsController {
 
         RestTemplate restTemplate = new RestTemplate();
         RatingDTO ratingDTO = new RatingDTO();
-        ArrayList<Pair> list = new ArrayList<>();
 
         Movie movie = restTemplate.getForObject("http://localhost:8083/movie/"+movieId, Movie.class);
 
-        ratings.stream()
-                .map((Function<Rating, Pair>) rating -> {
-                    User user = restTemplate.getForObject("http://localhost:8082/user/"+rating.getUid(), User.class);
+        List<Pair<String, Integer>> list = ratings.stream()
+                .map(rating -> {
+                    User user = restTemplate.getForObject("http://localhost:8082/user/" + rating.getUid(), User.class);
                     return Pair.of(user.getName(), rating.getRating());
                 })
-                .forEach(list::add);
+                .collect(Collectors.toList());
 
         if(movie != null) {
             ratingDTO.setName(movie.getName());
