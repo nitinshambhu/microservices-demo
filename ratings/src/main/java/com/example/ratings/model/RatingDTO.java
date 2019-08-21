@@ -4,11 +4,11 @@ import org.springframework.data.util.Pair;
 
 import java.util.List;
 
-public class Result {
+public class RatingDTO {
     private String name;
     private List<Pair> list;
 
-    public Result() {
+    public RatingDTO() {
     }
 
     public String getName() {
@@ -28,6 +28,6 @@ public class Result {
     }
 
     public String toString() {
-        return "Result(name=" + this.getName() + ", list=" + this.getList() + ")";
+        return "RatingDTO(name=" + this.getName() + ", list=" + this.getList() + ")";
     }
 }

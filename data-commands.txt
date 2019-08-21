@@ -16,9 +16,9 @@ insert into movie(id, name) VALUES (204, 'Shatakarni');
 insert into movie(id, name) VALUES (205, 'Bhairavadweepam');
 
 
-insert into user_rating VALUES (1, 103, 201, 4);
-insert into user_rating VALUES (2, 103, 205, 4);
-insert into user_rating VALUES (3, 101, 202, 5);
-insert into user_rating VALUES (4, 100, 201, 4);
-insert into user_rating VALUES (5, 102, 204, 5);
-insert into user_rating VALUES (6, 102, 203, 3);
+insert into rating VALUES (1, 103, 201, 4);
+insert into rating VALUES (2, 103, 205, 4);
+insert into rating VALUES (3, 101, 202, 5);
+insert into rating VALUES (4, 100, 201, 4);
+insert into rating VALUES (5, 102, 204, 5);
+insert into rating VALUES (6, 102, 203, 3);

@@ -2,7 +2,7 @@ package com.example.ratings.controller;
 
 import com.example.ratings.model.Movie;
 import com.example.ratings.model.Rating;
-import com.example.ratings.model.Result;
+import com.example.ratings.model.RatingDTO;
 import com.example.ratings.model.User;
 import com.example.ratings.repo.RatingRepository;
 
@@ -25,39 +25,51 @@ public class RatingsController {
     RatingRepository ratingRepository;
 
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
-    public Result getByUserId(@PathVariable int userId) {
+    public RatingDTO getByUserId(@PathVariable int userId) {
         RestTemplate restTemplate = new RestTemplate();
-        Result result = new Result();
-        User user = restTemplate.getForObject("http://localhost:8082/", User.class);
-        result.setName(user.getName());
+        RatingDTO ratingDTO = new RatingDTO();
+        User user = restTemplate.getForObject("http://localhost:8082/user/"+userId, User.class);
+        ratingDTO.setName(user.getName());
 
         List<Rating> ratings = ratingRepository.findByUid(userId);
-
+        System.out.println("TinTin : ratings = "+ratings);
         ratings.stream()
                 .map((Function<Rating, Pair>) rating -> {
-                    Movie movie = restTemplate.getForObject("http://localhost:8083/", Movie.class);
+                    Movie movie = restTemplate.getForObject("http://localhost:8083/movie"+rating.getMid(), Movie.class);
+                    System.out.println("TinTin : movie = "+movie);
                     return Pair.of(movie.getName(), rating.getRating());
                 })
-                .forEach(pair -> result.getList().add(pair));
-        return result;
+                .forEach(pair -> ratingDTO.getList().add(pair));
+        System.out.println("TinTin : ratingDTO = "+ratingDTO);
+        return ratingDTO;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/movie/{movieId}")
-    public Result getByMovieId(@PathVariable int movieId) {
+    public RatingDTO getByMovieId(@PathVariable int movieId) {
         RestTemplate restTemplate = new RestTemplate();
-        Result result = new Result();
-        Movie movie = restTemplate.getForObject("http://localhost:8083/", Movie.class);
+        RatingDTO result = new RatingDTO();
+        Movie movie = restTemplate.getForObject("http://localhost:8083/movie"+movieId, Movie.class);
         result.setName(movie.getName());
 
         List<Rating> ratings = ratingRepository.findByMid(movieId);
 
         ratings.stream()
                 .map((Function<Rating, Pair>) rating -> {
-                    User user = restTemplate.getForObject("http://localhost:8082/", User.class);
+                    User user = restTemplate.getForObject("http://localhost:8082/user/"+rating.getUid(), User.class);
                     return Pair.of(user.getName(), rating.getRating());
                 })
                 .forEach(pair -> result.getList().add(pair));
         return result;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/userId/{userId}")
+    public List<Rating> getByUId(@PathVariable int userId) {
+        return ratingRepository.findByUid(userId);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movieId/{movieId}")
+    public List<Rating> getByMId(@PathVariable int movieId) {
+        return ratingRepository.findByMid(movieId);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/rating/{rating}")
