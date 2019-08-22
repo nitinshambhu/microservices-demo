@@ -1,8 +1,8 @@
-package com.example.users.controller;
+package com.example.movie.controller;
 
-import com.example.users.model.User;
-import com.example.users.model.UserDTO;
-import com.example.users.repo.UserRepository;
+import com.example.movie.model.Movie;
+import com.example.movie.model.MovieDTO;
+import com.example.movie.repo.MovieRepository;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,30 +17,30 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/movie")
+public class MovieCatalogController {
 
     @Autowired
-    UserRepository repository;
+    MovieRepository repository;
 
     @Autowired
     ModelMapper mapper;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public UserDTO getUser(@PathVariable int userId) {
-        Optional<User> optionalUser = repository.findById(userId);
-        if(optionalUser.isPresent()){
-            return mapper.map(optionalUser.get(), UserDTO.class);
+    @RequestMapping(method = RequestMethod.GET, value = "/{movieId}")
+    public MovieDTO get(@PathVariable int movieId){
+        Optional<Movie> optionalMovie = repository.findById(movieId);
+        if(optionalMovie.isPresent()){
+            return mapper.map(optionalMovie.get(), MovieDTO.class);
         } else {
-            return new UserDTO();
+            return new MovieDTO();
         }
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/all")
-    public List<UserDTO> getUser() {
-        Iterable<User> iterable = repository.findAll();
+    public List<MovieDTO> all(){
+        Iterable<Movie> iterable = repository.findAll();
         return StreamSupport.stream(iterable.spliterator(), false)
-                .map(user -> mapper.map(user, UserDTO.class))
+                .map(movie -> mapper.map(movie, MovieDTO.class))
                 .collect(Collectors.toList());
     }
 }
