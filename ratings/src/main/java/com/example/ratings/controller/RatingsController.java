@@ -1,13 +1,16 @@
 package com.example.ratings.controller;
 
 import com.example.ratings.model.Movie;
+import com.example.ratings.model.MovieDTO;
+import com.example.ratings.model.MovieRatingDTO;
 import com.example.ratings.model.Rating;
-import com.example.ratings.model.RatingDTO;
 import com.example.ratings.model.User;
+import com.example.ratings.model.UserDTO;
+import com.example.ratings.model.UserRatingDTO;
 import com.example.ratings.repo.RatingRepository;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,53 +30,60 @@ public class RatingsController {
     @Autowired
     RatingRepository ratingRepository;
 
+    @Autowired
+    ModelMapper mapper;
+
+    @Autowired
+    RestTemplate restTemplate;
+
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
-    public RatingDTO getByUserId(@PathVariable int userId) {
+    public UserRatingDTO getByUserId(@PathVariable int userId) {
         log.info("Finding movies rated by user {} ", userId);
+
         List<Rating> ratings = ratingRepository.findByUid(userId);
-
-        RestTemplate restTemplate = new RestTemplate();
-        RatingDTO ratingDTO = new RatingDTO();
-
-        User user = restTemplate.getForObject("http://localhost:8082/user/"+userId, User.class);
         log.info("ratings = {} ", ratings);
 
-        List<Pair<String, Integer>> list = ratings.stream()
+        User user = restTemplate.getForObject("http://localhost:8082/user/"+userId, User.class);
+        List<MovieDTO> list = ratings.stream()
                 .map(rating -> {
                     Movie movie = restTemplate.getForObject("http://localhost:8083/movie/" + rating.getMid(), Movie.class);
-                    System.out.println("TinTin : movie = " + movie);
-                    return Pair.of(movie.getName(), rating.getRating());
+                    //How to handle null? Shouldn't we be returning something like 404 ?
+                    MovieDTO movieDTO = mapper.map(movie, MovieDTO.class);
+                    movieDTO.setRating(rating.getRating());
+                    return movieDTO;
                 })
                 .collect(Collectors.toList());
 
+        UserRatingDTO userRatingDTO = new UserRatingDTO();
         if(user != null) {
-            ratingDTO.setName(user.getName());
-            ratingDTO.setList(list);
+            userRatingDTO.setUserName(user.getName());
+            userRatingDTO.setList(list);
         }
 
-        log.info("returning DTO = {} ", ratingDTO);
-        return ratingDTO;
+        log.info("returning DTO = {} ", userRatingDTO);
+        return userRatingDTO;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/movie/{movieId}")
-    public RatingDTO getByMovieId(@PathVariable int movieId) {
+    public MovieRatingDTO getByMovieId(@PathVariable int movieId) {
+        log.info("Finding users who rated movie {} ", movieId);
 
         List<Rating> ratings = ratingRepository.findByMid(movieId);
-
-        RestTemplate restTemplate = new RestTemplate();
-        RatingDTO ratingDTO = new RatingDTO();
+        log.info("ratings = {} ", ratings);
 
         Movie movie = restTemplate.getForObject("http://localhost:8083/movie/"+movieId, Movie.class);
-
-        List<Pair<String, Integer>> list = ratings.stream()
+        List<UserDTO> list = ratings.stream()
                 .map(rating -> {
                     User user = restTemplate.getForObject("http://localhost:8082/user/" + rating.getUid(), User.class);
-                    return Pair.of(user.getName(), rating.getRating());
+                    UserDTO userDTO = mapper.map(user, UserDTO.class);
+                    userDTO.setRating(rating.getRating());
+                    return userDTO;
                 })
                 .collect(Collectors.toList());
 
+        MovieRatingDTO ratingDTO = new MovieRatingDTO();
         if(movie != null) {
-            ratingDTO.setName(movie.getName());
+            ratingDTO.setMovieName(movie.getName());
             ratingDTO.setList(list);
         }
 
