@@ -43,10 +43,10 @@ public class RatingsController {
         List<Rating> ratings = ratingRepository.findByUid(userId);
         log.info("ratings = {} ", ratings);
 
-        User user = restTemplate.getForObject("http://localhost:8082/user/"+userId, User.class);
+        User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/"+userId, User.class);
         List<MovieDTO> list = ratings.stream()
                 .map(rating -> {
-                    Movie movie = restTemplate.getForObject("http://localhost:8083/movie/" + rating.getMid(), Movie.class);
+                    Movie movie = restTemplate.getForObject("http://MOVIE-LOOKUP-SERVICE/movie/" + rating.getMid(), Movie.class);
                     //How to handle null? Shouldn't we be returning something like 404 ?
                     MovieDTO movieDTO = mapper.map(movie, MovieDTO.class);
                     movieDTO.setRating(rating.getRating());
@@ -71,10 +71,10 @@ public class RatingsController {
         List<Rating> ratings = ratingRepository.findByMid(movieId);
         log.info("ratings = {} ", ratings);
 
-        Movie movie = restTemplate.getForObject("http://localhost:8083/movie/"+movieId, Movie.class);
+        Movie movie = restTemplate.getForObject("http://MOVIE-LOOKUP-SERVICE/movie/"+movieId, Movie.class);
         List<UserDTO> list = ratings.stream()
                 .map(rating -> {
-                    User user = restTemplate.getForObject("http://localhost:8082/user/" + rating.getUid(), User.class);
+                    User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/" + rating.getUid(), User.class);
                     UserDTO userDTO = mapper.map(user, UserDTO.class);
                     userDTO.setRating(rating.getRating());
                     return userDTO;
