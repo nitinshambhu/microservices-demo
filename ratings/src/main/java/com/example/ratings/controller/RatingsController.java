@@ -1,5 +1,7 @@
 package com.example.ratings.controller;
 
+import com.example.ratings.configuration.MovieServiceClient;
+import com.example.ratings.configuration.UserServiceClient;
 import com.example.ratings.model.Movie;
 import com.example.ratings.model.MovieDTO;
 import com.example.ratings.model.MovieRatingDTO;
@@ -36,6 +38,17 @@ public class RatingsController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    MovieServiceClient movieServiceClient;
+
+    @Autowired
+    UserServiceClient userServiceClient;
+
+    /**
+     * Uses RestTemplate to fetch UserRating
+     * @param userId - Integer
+     * @return UserRating
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
     public UserRatingDTO getByUserId(@PathVariable int userId) {
         log.info("Finding movies rated by user {} ", userId);
@@ -64,6 +77,11 @@ public class RatingsController {
         return userRatingDTO;
     }
 
+    /**
+     * Uses Feign Client to fetch UserRating
+     * @param movieId - Integer
+     * @return MovieRating
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/movie/{movieId}")
     public MovieRatingDTO getByMovieId(@PathVariable int movieId) {
         log.info("Finding users who rated movie {} ", movieId);
@@ -71,10 +89,10 @@ public class RatingsController {
         List<Rating> ratings = ratingRepository.findByMid(movieId);
         log.info("ratings = {} ", ratings);
 
-        Movie movie = restTemplate.getForObject("http://MOVIE-LOOKUP-SERVICE/movie/"+movieId, Movie.class);
+        Movie movie = movieServiceClient.getMovieById(movieId);
         List<UserDTO> list = ratings.stream()
                 .map(rating -> {
-                    User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/" + rating.getUid(), User.class);
+                    User user = userServiceClient.getUserById(rating.getUid());
                     UserDTO userDTO = mapper.map(user, UserDTO.class);
                     userDTO.setRating(rating.getRating());
                     return userDTO;
