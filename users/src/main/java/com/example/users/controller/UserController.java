@@ -17,7 +17,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @RequestMapping("/user")
 public class UserController {
 
