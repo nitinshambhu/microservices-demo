@@ -1,4 +1,4 @@
-package com.example.ratings.configuration;
+package com.example.ratings.client;
 
 import com.example.ratings.model.Movie;
 

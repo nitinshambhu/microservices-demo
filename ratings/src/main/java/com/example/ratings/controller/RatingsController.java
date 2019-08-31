@@ -1,16 +1,10 @@
 package com.example.ratings.controller;
 
-import com.example.ratings.configuration.MovieServiceClient;
-import com.example.ratings.configuration.UserServiceClient;
-import com.example.ratings.model.Movie;
-import com.example.ratings.model.MovieDTO;
-import com.example.ratings.model.MovieRatingDTO;
-import com.example.ratings.model.Rating;
-import com.example.ratings.model.User;
-import com.example.ratings.model.UserDTO;
-import com.example.ratings.model.UserRatingDTO;
+import com.example.ratings.client.MovieServiceClient;
+import com.example.ratings.client.UserServiceClient;
+import com.example.ratings.model.*;
 import com.example.ratings.repo.RatingRepository;
-
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -46,6 +38,7 @@ public class RatingsController {
 
     /**
      * Uses RestTemplate to fetch UserRating
+     *
      * @param userId - Integer
      * @return UserRating
      */
@@ -56,7 +49,7 @@ public class RatingsController {
         List<Rating> ratings = ratingRepository.findByUid(userId);
         log.info("ratings = {} ", ratings);
 
-        User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/"+userId, User.class);
+        User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/" + userId, User.class);
         List<MovieDTO> list = ratings.stream()
                 .map(rating -> {
                     Movie movie = restTemplate.getForObject("http://MOVIE-LOOKUP-SERVICE/movie/" + rating.getMid(), Movie.class);
@@ -68,7 +61,7 @@ public class RatingsController {
                 .collect(Collectors.toList());
 
         UserRatingDTO userRatingDTO = new UserRatingDTO();
-        if(user != null) {
+        if (user != null) {
             userRatingDTO.setUserName(user.getName());
             userRatingDTO.setList(list);
         }
@@ -79,6 +72,7 @@ public class RatingsController {
 
     /**
      * Uses Feign Client to fetch UserRating
+     *
      * @param movieId - Integer
      * @return MovieRating
      */
@@ -100,7 +94,7 @@ public class RatingsController {
                 .collect(Collectors.toList());
 
         MovieRatingDTO ratingDTO = new MovieRatingDTO();
-        if(movie != null) {
+        if (movie != null) {
             ratingDTO.setMovieName(movie.getName());
             ratingDTO.setList(list);
         }

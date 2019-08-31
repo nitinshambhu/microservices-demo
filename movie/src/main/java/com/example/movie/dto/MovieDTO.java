@@ -1,4 +1,4 @@
-package com.example.users.model;
+package com.example.movie.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter @Setter @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class MovieDTO {
     private int id;
     private String name;
 }
