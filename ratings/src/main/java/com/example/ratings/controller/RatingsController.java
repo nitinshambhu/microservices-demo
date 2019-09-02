@@ -1,7 +1,5 @@
 package com.example.ratings.controller;
 
-import com.example.ratings.configuration.MovieServiceClient;
-import com.example.ratings.configuration.UserServiceClient;
 import com.example.ratings.model.Movie;
 import com.example.ratings.model.MovieDTO;
 import com.example.ratings.model.MovieRatingDTO;
@@ -10,6 +8,8 @@ import com.example.ratings.model.User;
 import com.example.ratings.model.UserDTO;
 import com.example.ratings.model.UserRatingDTO;
 import com.example.ratings.repo.RatingRepository;
+import com.example.ratings.service.MovieInfoService;
+import com.example.ratings.service.UserInfoService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +21,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/user-ratings")
 public class RatingsController {
 
@@ -38,11 +41,9 @@ public class RatingsController {
     @Autowired
     RestTemplate restTemplate;
 
-    @Autowired
-    MovieServiceClient movieServiceClient;
+    private final MovieInfoService movieInfoService;
 
-    @Autowired
-    UserServiceClient userServiceClient;
+    private final UserInfoService userInfoService;
 
     /**
      * Uses RestTemplate to fetch UserRating
@@ -89,14 +90,17 @@ public class RatingsController {
         List<Rating> ratings = ratingRepository.findByMid(movieId);
         log.info("ratings = {} ", ratings);
 
-        Movie movie = movieServiceClient.getMovieById(movieId);
-        List<UserDTO> list = ratings.stream()
+        Movie movie = movieInfoService.getMovieById(movieId);
+        List<UserDTO> list = Stream.of(movie)
+                .filter(mov -> mov != null && !mov.getName().isEmpty())
+                .flatMap(movi -> ratings.stream())
                 .map(rating -> {
-                    User user = userServiceClient.getUserById(rating.getUid());
+                    User user = userInfoService.getUserById(rating.getUid());
                     UserDTO userDTO = mapper.map(user, UserDTO.class);
                     userDTO.setRating(rating.getRating());
                     return userDTO;
                 })
+                .filter(userDTO -> !userDTO.getUserName().isEmpty())
                 .collect(Collectors.toList());
 
         MovieRatingDTO ratingDTO = new MovieRatingDTO();
@@ -107,19 +111,4 @@ public class RatingsController {
 
         return ratingDTO;
     }
-
-    /*@RequestMapping(method = RequestMethod.GET, value = "/userId/{userId}")
-    public List<Rating> getByUId(@PathVariable int userId) {
-        return ratingRepository.findByUid(userId);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/movieId/{movieId}")
-    public List<Rating> getByMId(@PathVariable int movieId) {
-        return ratingRepository.findByMid(movieId);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/rating/{rating}")
-    public List<Rating> getByRating(@PathVariable int rating) {
-        return ratingRepository.findByRating(rating);
-    }*/
 }
