@@ -1,4 +1,4 @@
-package com.example.ratings.repo;
+package com.example.ratings.data.repo;
 
 
 import com.example.ratings.model.Rating;

@@ -1,6 +1,6 @@
 package com.example.ratings.service;
 
-import com.example.ratings.configuration.MovieServiceClient;
+import com.example.ratings.data.client.MovieServiceClient;
 import com.example.ratings.model.Movie;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
