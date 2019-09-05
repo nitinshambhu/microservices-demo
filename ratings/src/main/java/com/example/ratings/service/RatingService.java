@@ -1,5 +1,8 @@
 package com.example.ratings.service;
 
+import com.example.ratings.data.client.RestTemplateService;
+import com.example.ratings.data.repo.RatingRepository;
+import com.example.ratings.exception.ResourceNotFoundException;
 import com.example.ratings.model.Movie;
 import com.example.ratings.model.MovieDTO;
 import com.example.ratings.model.MovieRatingDTO;
@@ -7,12 +10,10 @@ import com.example.ratings.model.Rating;
 import com.example.ratings.model.User;
 import com.example.ratings.model.UserDTO;
 import com.example.ratings.model.UserRatingDTO;
-import com.example.ratings.data.repo.RatingRepository;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class RatingService {
     private final MovieInfoService movieInfoService;
     private final UserInfoService userInfoService;
     private final ModelMapper mapper;
-    private final RestTemplate restTemplate;
+    private final RestTemplateService restTemplateService;
 
     /**
      * Uses RestTemplate to fetch UserRating
@@ -43,10 +44,10 @@ public class RatingService {
         List<Rating> ratings = ratingRepository.findByUid(userId);
         log.info("ratings = {} ", ratings);
 
-        User user = restTemplate.getForObject("http://USER-LOOKUP-SERVICE/user/" + userId, User.class);
+        User user = restTemplateService.getUserbyId(userId);
         List<MovieDTO> list = ratings.stream()
                 .map(rating -> {
-                    Movie movie = restTemplate.getForObject("http://MOVIE-LOOKUP-SERVICE/movie/" + rating.getMid(), Movie.class);
+                    Movie movie = restTemplateService.getMoviebyId(rating.getMid());
                     //How to handle null? Shouldn't we be returning something like 404 ?
                     MovieDTO movieDTO = mapper.map(movie, MovieDTO.class);
                     movieDTO.setRating(rating.getRating());
@@ -70,11 +71,14 @@ public class RatingService {
      * @param movieId - Integer
      * @return MovieRating
      */
-    public MovieRatingDTO getByMovieId(int movieId) {
+    public MovieRatingDTO getByMovieId(int movieId) throws Exception {
         log.info("Finding users who rated movie {} ", movieId);
 
         List<Rating> ratings = ratingRepository.findByMid(movieId);
         log.info("ratings = {} ", ratings);
+
+        if(ratings == null)
+            throw new ResourceNotFoundException("Ratings not found for movieId : " + movieId);
 
         Movie movie = movieInfoService.getMovieById(movieId);
         List<UserDTO> list = Stream.of(movie)
