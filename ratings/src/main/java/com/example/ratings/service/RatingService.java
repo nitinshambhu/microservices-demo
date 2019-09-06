@@ -77,7 +77,7 @@ public class RatingService {
         List<Rating> ratings = ratingRepository.findByMid(movieId);
         log.info("ratings = {} ", ratings);
 
-        if(ratings == null)
+        if(ratings.isEmpty())
             throw new ResourceNotFoundException("Ratings not found for movieId : " + movieId);
 
         Movie movie = movieInfoService.getMovieById(movieId);

@@ -19,7 +19,7 @@ public class RatingsController {
     private final RatingService ratingService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/movie/{movieId}")
-    public MovieRatingDTO getByMovieId(@PathVariable int movieId){
+    public MovieRatingDTO getByMovieId(@PathVariable int movieId) throws Exception {
         return ratingService.getByMovieId(movieId);
     }
 
