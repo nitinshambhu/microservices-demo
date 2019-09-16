@@ -1,5 +1,6 @@
 package com.example.movie.controller;
 
+import com.example.movie.exception.ResourceNotFoundException;
 import com.example.movie.model.MovieDTO;
 import com.example.movie.repo.MovieRepository;
 
@@ -25,10 +26,10 @@ public class MovieCatalogController {
     private final ModelMapper mapper;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{movieId}")
-    public MovieDTO get(@PathVariable int movieId) {
+    public MovieDTO get(@PathVariable int movieId) throws ResourceNotFoundException {
         return repository.findById(movieId)
                 .map(movie -> mapper.map(movie, MovieDTO.class))
-                .orElseGet(MovieDTO::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found for id : " + movieId));
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/all")

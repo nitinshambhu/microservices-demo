@@ -1,5 +1,6 @@
 package com.example.users.controller;
 
+import com.example.users.exception.ResourceNotFoundException;
 import com.example.users.model.UserDTO;
 import com.example.users.repo.UserRepository;
 
@@ -26,10 +27,10 @@ public class UserController {
     private final ModelMapper mapper;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public UserDTO getUser(@PathVariable int userId) {
+    public UserDTO getUser(@PathVariable int userId) throws ResourceNotFoundException {
         return repository.findById(userId)
                 .map(user -> mapper.map(user, UserDTO.class))
-                .orElseGet(UserDTO::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found for id : " + userId));
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/all")
