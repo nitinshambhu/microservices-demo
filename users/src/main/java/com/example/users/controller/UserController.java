@@ -1,18 +1,29 @@
 package com.example.users.controller;
 
-import com.example.users.exception.ResourceNotFoundException;
+import com.example.users.UserCreationFailedException;
+import com.example.users.UserNotFoundException;
+import com.example.users.model.Response;
+import com.example.users.model.User;
 import com.example.users.model.UserDTO;
 import com.example.users.repo.UserRepository;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +38,53 @@ public class UserController {
     private final ModelMapper mapper;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public UserDTO getUser(@PathVariable int userId) throws ResourceNotFoundException {
-        return repository.findById(userId)
+    @ResponseStatus(code = HttpStatus.OK)
+    public Response<UserDTO> getUser(@PathVariable int userId) throws UserNotFoundException {
+
+        UserDTO userDTO = repository.findById(userId)
                 .map(user -> mapper.map(user, UserDTO.class))
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found for id : " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found for userId = " + userId));
+
+        return Response.<UserDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .statusMessage(HttpStatus.OK.getReasonPhrase())
+                .data(userDTO)
+                .build();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/all")
-    public List<UserDTO> getUser() {
-        return repository.findAll()
+    @ResponseStatus(code = HttpStatus.OK)
+    public Response<List<UserDTO>> getUser() {
+
+        List<UserDTO> list = repository.findAll()
                 .stream()
                 .map(user -> mapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
+
+        return Response.<List<UserDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .statusMessage(HttpStatus.OK.getReasonPhrase())
+                .data(list)
+                .build();
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(code = HttpStatus.OK)
+    public Response<UserDTO> addUser(@Valid @RequestBody User user) throws UserCreationFailedException {
+
+        try {
+
+            UserDTO userDTO = mapper.map(repository.save(user), UserDTO.class);
+
+            return Response.<UserDTO>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .statusMessage(HttpStatus.OK.getReasonPhrase())
+                    .data(userDTO)
+                    .build();
+
+        } catch (Exception ex) {
+            throw new UserCreationFailedException("Failed to create user " + user);
+        }
+
     }
 }
