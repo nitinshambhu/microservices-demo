@@ -1,14 +1,13 @@
-package com.example.users.controller;
+package com.example.users;
 
-import com.example.users.UserCreationFailedException;
-import com.example.users.UserNotFoundException;
+import com.example.users.exception.UserCreationFailedException;
+import com.example.users.exception.UserNotFoundException;
 import com.example.users.model.Response;
 import com.example.users.model.User;
 import com.example.users.model.UserDTO;
 import com.example.users.repo.UserRepository;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,9 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;

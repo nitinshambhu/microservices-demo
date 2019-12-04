@@ -1,5 +1,7 @@
 package com.example.users;
 
+import com.example.users.exception.UserCreationFailedException;
+import com.example.users.exception.UserNotFoundException;
 import com.example.users.model.Response;
 import com.example.users.model.UserDTO;
 
