@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ControllerAdvice
-public class UsersExceptionHandler {
+public class UserServiceControllerAdvice {
 
     @ResponseBody
     @ExceptionHandler(UserNotFoundException.class)
