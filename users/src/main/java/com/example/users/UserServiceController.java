@@ -45,7 +45,7 @@ public class UserServiceController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
-    public Response<UserDTO> addUser(@RequestBody User user) throws UserCreationFailedException {
+    public Response<UserDTO> addUser(@Valid @RequestBody User user) throws UserCreationFailedException {
         return userService.addUser(user);
     }
 }

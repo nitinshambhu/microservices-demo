@@ -55,7 +55,7 @@ class UserService {
     }
 
 
-    Response<UserDTO> addUser(@Valid User user) throws UserCreationFailedException {
+    Response<UserDTO> addUser(User user) throws UserCreationFailedException {
 
         try {
 
