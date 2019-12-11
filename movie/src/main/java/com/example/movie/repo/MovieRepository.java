@@ -12,4 +12,6 @@ public interface MovieRepository extends Repository<Movie, Integer> {
     Optional<Movie> findById(Integer id);
 
     List<Movie> findAll();
+
+    Movie save(Movie movie);
 }

@@ -68,7 +68,7 @@ class UserService {
                     .build();
 
         } catch (Exception ex) {
-            throw new UserCreationFailedException("Failed to create user " + user);
+            throw new UserCreationFailedException(ex.getMessage());
         }
 
     }
