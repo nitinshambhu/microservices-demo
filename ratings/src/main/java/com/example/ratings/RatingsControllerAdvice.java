@@ -1,6 +1,7 @@
-package com.example.ratings.controller;
+package com.example.ratings;
 
 import com.example.ratings.exception.ResourceNotFoundException;
+import com.example.ratings.model.Response;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,7 +13,10 @@ public class RatingsControllerAdvice {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String onResourceNotFoundException(ResourceNotFoundException exception){
-        return exception.getMessage();
+    public Response handleMovieNotFoundException(ResourceNotFoundException exception){
+        return Response.builder()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .statusMessage(exception.getMessage())
+                .build();
     }
 }
