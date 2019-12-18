@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class RatingService {
     private final UserInfoService userInfoService;
     private final ModelMapper mapper;
     private final RestTemplateService restTemplateService;
+    private final RestTemplate restTemplate;
 
     /**
      * Uses RestTemplate to fetch UserRating
@@ -51,7 +53,9 @@ public class RatingService {
         if (ratings.isEmpty())
             throw new ResourceNotFoundException("No Ratings found for user Id : " + userId);
 
-        User user = restTemplateService.getUserbyId(userId);
+        Response<User> response = restTemplateService.getUserbyId(userId);
+        User user = response.data();
+        log.info("response = {} ", response);
         log.info("user = {} ", user);
         if (user == null)
             throw new ResourceNotFoundException("No user found with id : " + userId);
@@ -59,7 +63,7 @@ public class RatingService {
         List<MovieDTO> list = ratings.stream()
                 .map(rating -> {
                     // Not checking if movie is null. Movie can be null only when data is inconsistent
-                    Movie movie = restTemplateService.getMoviebyId(rating.getMid());
+                    Movie movie = restTemplateService.getMoviebyId(rating.getMid()).data();
                     log.info("movie = {} ", movie);
                     MovieDTO movieDTO = mapper.map(movie, MovieDTO.class);
                     movieDTO.setRating(rating.getRating());
@@ -95,24 +99,24 @@ public class RatingService {
         if (ratings.isEmpty())
             throw new ResourceNotFoundException("No Ratings found for movie Id : " + movieId);
 
-        Movie movie = movieInfoService.getMovieById(movieId);
-        log.info("movie = {} ", movie);
-        if (movie == null)
+        Response<Movie> movieResponse = movieInfoService.getMovieById(movieId);
+        log.info("movieResponse = {} ", movieResponse);
+        if (movieResponse.data() == null)
             throw new ResourceNotFoundException("No movie found with id : " + movieId);
 
         List<UserDTO> list = ratings.stream()
                 .map(rating -> {
                     // Not checking if user is null. User can be null only when data is inconsistent
-                    User user = userInfoService.getUserById(rating.getUid());
-                    log.info("user = {} ", user);
-                    UserDTO userDTO = mapper.map(user, UserDTO.class);
+                    Response<User> userResponse = userInfoService.getUserById(rating.getUid());
+                    log.info("userResponse = {} ", userResponse);
+                    UserDTO userDTO = mapper.map(userResponse.data(), UserDTO.class);
                     userDTO.setRating(rating.getRating());
                     return userDTO;
                 })
                 .collect(Collectors.toList());
 
         MovieRatingDTO movieRatingDTO = new MovieRatingDTO();
-        movieRatingDTO.setMovieName(movie.getName());
+        movieRatingDTO.setMovieName(movieResponse.data().getName());
         movieRatingDTO.setList(list);
 
         log.info("returning DTO = {} ", movieRatingDTO);

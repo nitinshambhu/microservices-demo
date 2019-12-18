@@ -1,6 +1,7 @@
 package com.example.ratings.data.client;
 
 import com.example.ratings.model.Movie;
+import com.example.ratings.model.Response;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface MovieServiceClient {
 
     @RequestMapping(value = "/movie/{id}", method = RequestMethod.GET)
-    public Movie getMovieById(@PathVariable(name = "id") int id);
+    public Response<Movie> getMovieById(@PathVariable(name = "id") int id);
 
 }
