@@ -1,6 +1,7 @@
 package com.example.ratings.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import org.springframework.lang.Nullable;
@@ -20,11 +21,23 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonDeserialize(builder = Response.ResponseBuilder.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Response<T> {
-    private int statusCode;
     @Nullable
-    private String statusMessage;
+    public int statusCode;
     @Nullable
-    private T data;
+    public String statusMessage;
+    @Nullable
+    public T data;
+
+    @JsonCreator
+    public static <T> Response<T> newInstance(
+            @JsonProperty("statusCode") int statusCode,
+            @JsonProperty("statusMessage") String statusMessage,
+            @JsonProperty("data") T data) {
+        return new ResponseBuilder<T>()
+                .statusCode(statusCode)
+                .statusMessage(statusMessage)
+                .data(data)
+                .build();
+    }
 }
