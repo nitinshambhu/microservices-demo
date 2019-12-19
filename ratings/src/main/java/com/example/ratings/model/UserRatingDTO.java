@@ -2,17 +2,17 @@ package com.example.ratings.model;
 
 import java.util.List;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Singular;
 import lombok.ToString;
 
 
 @Getter
-@Setter
-@NoArgsConstructor
 @ToString
+@Builder
 public class UserRatingDTO {
     private String userName;
-    private List<MovieDTO> list;
+    @Singular
+    private List<MovieDTO> movies;
 }

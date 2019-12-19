@@ -13,6 +13,7 @@ import com.example.ratings.model.UserDTO;
 import com.example.ratings.model.UserRatingDTO;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,34 +54,36 @@ public class RatingService {
         if (ratings.isEmpty())
             throw new ResourceNotFoundException("No Ratings found for user Id : " + userId);
 
-        Response<User> response = restTemplateService.getUserbyId(userId);
-        User user = response.data();
-        log.info("response = {} ", response);
+        User user = restTemplateService.getUserbyId(userId).getData();
         log.info("user = {} ", user);
+
         if (user == null)
             throw new ResourceNotFoundException("No user found with id : " + userId);
 
-        List<MovieDTO> list = ratings.stream()
+        UserRatingDTO.UserRatingDTOBuilder builder = UserRatingDTO.builder();
+        builder.userName(user.getName());
+
+        ratings.stream()
                 .map(rating -> {
-                    // Not checking if movie is null. Movie can be null only when data is inconsistent
-                    Movie movie = restTemplateService.getMoviebyId(rating.getMid()).data();
+                    Movie movie = restTemplateService.getMoviebyId(rating.getMid()).getData();
                     log.info("movie = {} ", movie);
-                    MovieDTO movieDTO = mapper.map(movie, MovieDTO.class);
-                    movieDTO.setRating(rating.getRating());
+                    return Pair.of(rating.getRating(), movie);
+                })
+                .filter(ratingMoviePair -> ratingMoviePair.getSecond() != null)
+                .map(ratingMoviePair -> {
+                    // Not checking if movie is null. Movie can be null only when data is inconsistent
+                    MovieDTO movieDTO = mapper.map(ratingMoviePair.getSecond(), MovieDTO.class);
+                    movieDTO.setRating(ratingMoviePair.getFirst());
                     return movieDTO;
                 })
-                .collect(Collectors.toList());
+                .forEach(builder::movie); // Making use of add method created by lombok @Singular to add each item to a collection
 
-        UserRatingDTO userRatingDTO = new UserRatingDTO();
-        userRatingDTO.setUserName(user.getName());
-        userRatingDTO.setList(list);
-
-        log.info("returning DTO = {} ", userRatingDTO);
+        log.info("returning DTO builder = {} ", builder);
         log.info("Returning list of movies rated by user");
         return Response.<UserRatingDTO>builder()
                 .statusCode(HttpStatus.OK.value())
                 .statusMessage(HttpStatus.OK.getReasonPhrase())
-                .data(userRatingDTO)
+                .data(builder.build())
                 .build();
     }
 
@@ -101,30 +104,37 @@ public class RatingService {
 
         Response<Movie> movieResponse = movieInfoService.getMovieById(movieId);
         log.info("movieResponse = {} ", movieResponse);
-        if (movieResponse.data() == null)
+
+        if (movieResponse.getData() == null)
             throw new ResourceNotFoundException("No movie found with id : " + movieId);
+
+        MovieRatingDTO.MovieRatingDTOBuilder builder =  MovieRatingDTO.builder();
+        builder.movieName(movieResponse.getData().getName());
 
         List<UserDTO> list = ratings.stream()
                 .map(rating -> {
                     // Not checking if user is null. User can be null only when data is inconsistent
                     Response<User> userResponse = userInfoService.getUserById(rating.getUid());
                     log.info("userResponse = {} ", userResponse);
-                    UserDTO userDTO = mapper.map(userResponse.data(), UserDTO.class);
-                    userDTO.setRating(rating.getRating());
+                    return Pair.of(rating.getRating(), userResponse.getData());
+                })
+                .filter(ratingUserPair -> ratingUserPair.getSecond() != null)
+                .map(ratingUserPair -> {
+                    UserDTO userDTO = mapper.map(ratingUserPair.getSecond(), UserDTO.class);
+                    userDTO.setRating(ratingUserPair.getFirst());
                     return userDTO;
                 })
                 .collect(Collectors.toList());
 
-        MovieRatingDTO movieRatingDTO = new MovieRatingDTO();
-        movieRatingDTO.setMovieName(movieResponse.data().getName());
-        movieRatingDTO.setList(list);
+        // Making use of setter method created by lombok @Singular to add a collection
+        builder.users(list);
 
-        log.info("returning DTO = {} ", movieRatingDTO);
+        log.info("returning DTO builder = {} ", builder);
         log.info("Returning list of movies rated by user");
         return Response.<MovieRatingDTO>builder()
                 .statusCode(HttpStatus.OK.value())
                 .statusMessage(HttpStatus.OK.getReasonPhrase())
-                .data(movieRatingDTO)
+                .data(builder.build())
                 .build();
     }
 }
