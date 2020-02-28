@@ -16,13 +16,13 @@ zuul:
   routes:
     movie:
       path: /movie/**
-      serviceId: movie-lookup-service/movie/**
+      serviceId: movie-lookup-service
 #      url: http://localhost:8083/movie/
     user:
       path: /user/**
-      serviceId: user-lookup-service/user/**
+      serviceId: user-lookup-service
 #      url: http://localhost:8082/user/
     rating:
       path: /rating/**
-      serviceId: rating-service/rating/
+      serviceId: rating-service
 #      url: http://localhost:8081/rating/

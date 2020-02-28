@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-@RequestMapping("/movie")
+//@RequestMapping("/movie")
 public class MovieController {
 
     private final MovieService movieService;

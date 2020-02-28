@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-@RequestMapping("/user")
+//@RequestMapping("/user")
 public class UserServiceController {
 
     private final UserService userService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "USER-LOOKUP-SERVICE")
 public interface UserServiceClient {
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Response<User> getUserById(@PathVariable(name = "id") int id);
 
 }

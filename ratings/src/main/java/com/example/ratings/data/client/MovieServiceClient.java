@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "MOVIE-LOOKUP-SERVICE")
 public interface MovieServiceClient {
 
-    @RequestMapping(value = "/movie/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Response<Movie> getMovieById(@PathVariable(name = "id") int id);
 
 }

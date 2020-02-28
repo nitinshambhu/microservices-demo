@@ -27,7 +27,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
 
     @Override
     public Response<User> getUserbyId(int userId) {
-        return restTemplate.exchange("http://USER-LOOKUP-SERVICE/user/" + userId,
+        return restTemplate.exchange("http://USER-LOOKUP-SERVICE/" + userId,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Response<User>>() {
@@ -37,7 +37,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
 
     @Override
     public Response<Movie> getMoviebyId(int movieId) {
-        return restTemplate.exchange("http://MOVIE-LOOKUP-SERVICE/movie/" + movieId,
+        return restTemplate.exchange("http://MOVIE-LOOKUP-SERVICE/" + movieId,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Response<Movie>>() {
