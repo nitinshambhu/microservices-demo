@@ -22,7 +22,6 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userDetails.stream()
                 .filter((user) -> username.equals(user.getUsername()))
-                .peek(System.out::println)
                 .findFirst()
                 .orElseThrow(() -> new UsernameNotFoundException("Username " + username + " is not found"));
     }

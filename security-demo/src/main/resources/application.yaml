@@ -14,7 +14,8 @@ spring:
 
 runtime:
   profile: usersvc #inMemory, usersvc, jdbc
-#  security:
-#    user:
-#      name: spring
-#      password: spring
+
+
+app:
+    props:
+      centralized-auth: false
